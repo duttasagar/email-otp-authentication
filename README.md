@@ -133,10 +133,20 @@ SecureAuth/
 Add screenshots of:
 
 - Login Page
+- <img width="1902" height="908" alt="Screenshot 2026-07-25 200624" src="https://github.com/user-attachments/assets/618319e7-9559-4ab1-a535-e210cd9d1ec9" />
+
 - Registration Page
+- <img width="1901" height="898" alt="Screenshot 2026-07-25 201737" src="https://github.com/user-attachments/assets/b5ab5cc3-f0af-4d11-ac52-270026584f43" />
+
 - OTP Verification
+- <img width="1911" height="907" alt="Screenshot 2026-07-25 201403" src="https://github.com/user-attachments/assets/15ab187a-c2cb-4d5a-a08a-a066c9df350b" />
+
 - Forgot Password
+- <img width="1907" height="902" alt="Screenshot 2026-07-25 201336" src="https://github.com/user-attachments/assets/1fe40b2d-5081-4201-a94e-209a2f0d64a8" />
+
 - Reset Password
+- <img width="1906" height="900" alt="Screenshot 2026-07-25 201436" src="https://github.com/user-attachments/assets/b31ebba3-cd68-43fb-bf30-ba4af0d2867e" />
+
 
 ---
 

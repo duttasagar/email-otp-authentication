@@ -5,7 +5,9 @@ SecureAuth is a secure authentication system built with **React.js** and **Djang
 The project demonstrates modern authentication practices by verifying users through email before allowing account access, making it suitable as a portfolio and learning project.
 
 ---
-
+<!-- superuser
+Email:duttasagar39@gmail.com
+Password:12345 -->
 ## 🚀 Features
 
 ### User Registration

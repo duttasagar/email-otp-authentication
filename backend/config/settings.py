@@ -24,11 +24,9 @@ load_dotenv(BASE_DIR / ".env")
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ck+f@pfr2li#ypo#ojzu_nv&s1hcx7mr^q-o6b5_cp1x4_s9j('
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+SECRET_KEY = os.getenv("SECRET_KEY")
+DEBUG = os.getenv("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = []
 
@@ -43,11 +41,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'accounts',
-    'companies',
-    'jobs',
-    'applications',
-    'common',
-    'notifications',
     "corsheaders",
     'rest_framework',
      "rest_framework_simplejwt.token_blacklist",
@@ -168,14 +161,19 @@ USE_TZ = True
 STATIC_URL = 'static/'
 AUTH_USER_MODEL = "accounts.User"
 
+
+
+
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
-EMAIL_HOST = "smtp.gmail.com"
+EMAIL_HOST = os.getenv("EMAIL_HOST")
 
-EMAIL_PORT = 587
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
 
-EMAIL_USE_TLS = True
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True") == "True"
 
-EMAIL_HOST_USER = "duttasagar39@gmail.com"
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 
-EMAIL_HOST_PASSWORD = "unsdnznyyawlmilk"
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")

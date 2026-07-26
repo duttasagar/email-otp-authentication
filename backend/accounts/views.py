@@ -825,11 +825,10 @@ def reset_password(request):
 @api_view(["GET"])
 def smtp_test(request):
     try:
-        socket.create_connection(("smtp.gmail.com", 587), timeout=10)
-        return Response({"status": "SMTP connection successful"})
+        socket.create_connection(("smtp-relay.brevo.com", 587), timeout=10)
+        return Response({"status": "Brevo SMTP connection successful"})
     except Exception as e:
         return Response({"error": str(e)})
-
 
 
 

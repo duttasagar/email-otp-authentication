@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .views import smtp_test
 
 urlpatterns = [
     path("verify-otp/", views.verify_otp, name="verify-otp"),
@@ -9,6 +10,7 @@ urlpatterns = [
     path("forgot-password/", views.forgot_password),
     path("verify-reset-otp/", views.verify_reset_otp),
     path("reset-password/", views.reset_password),
+    path("smtp-test/", smtp_test),
 
 
 ]

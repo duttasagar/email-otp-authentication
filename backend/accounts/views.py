@@ -13,6 +13,9 @@ from django.core.cache import cache
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 import traceback
+import socket
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
 User = get_user_model()
 
 
@@ -24,169 +27,6 @@ def get_tokens_for_user(user):
         "access": str(refresh.access_token),
     }
 
-# @csrf_exempt
-# def register(request):
-#     if request.method != "POST":
-#         return JsonResponse(
-#             {
-#                 "status": False,
-#                 "message": "Only POST request allowed"
-#             },
-#             status=405,
-#         )
-
-#     try:
-#         data = json.loads(request.body)
-
-#         username = data.get("username")
-#         email = data.get("email")
-#         password = data.get("password")
-#         phone = data.get("phone")
-#         role = data.get("role")
-
-#         # Validate required fields
-#         # if not all([username, email, password, phone, role]):
-#         #     return JsonResponse(
-#         #         {
-#         #             "status": False,
-#         #             "message": "All fields are required."
-#         #         },
-#         #         status=400,
-#         #     )
-#         if not username:
-#             return JsonResponse({
-#                 "status": False,
-#                 "field": "username",
-#                 "message": "Username is required."
-#             }, status=400)
-
-#         if len(username) < 3:
-#             return JsonResponse({
-#                 "status": False,
-#                 "field": "username",
-#                 "message": "Username must be at least 3 characters."
-#             }, status=400)
-
-
-#         if not email:
-#             return JsonResponse({
-#                 "status": False,
-#                 "field": "email",
-#                 "message": "Email is required."
-#             }, status=400)
-#         try:
-#                 validate_email(email)
-#         except ValidationError:
-#                 return JsonResponse({
-#                     "status": False,
-#                     "field": "email",
-#                     "message": "Enter a valid email address."
-#                 }, status=400)
-
-#         if not phone:
-#             return JsonResponse({
-#                 "status": False,
-#                 "field": "phone",
-#                 "message": "Phone number is required."
-#             }, status=400)
-        
-#         if not phone.isdigit() or len(phone) != 10:
-#             return JsonResponse({
-#                 "status": False,
-#                 "field": "phone",
-#                 "message": "Enter a valid 10-digit phone number."
-#             }, status=400)
-
-
-#         if not password:
-#             return JsonResponse({
-#                 "status": False,
-#                 "field": "password",
-#                 "message": "Password is required."
-#             }, status=400)
-
-#         if len(password) < 8:
-#             return JsonResponse({
-#                 "status": False,
-#                 "field": "password",
-#                 "message": "Password must be at least 8 characters."
-#             }, status=400)
-
-#         if not role:
-#             return JsonResponse({
-#                 "status": False,
-#                 "field": "role",
-#                 "message": "Role is required."
-#             }, status=400)
-
-        
-#         # Check if email already exists
-#         if User.objects.filter(email=email).exists():
-#             return JsonResponse(
-#                 {
-#                     "status": False,
-#                     "field": "email",
-#                     "message": "Email already registered."
-#                 },
-#                 status=400,
-#             )
-
-#         # Check if username already exists
-#         if User.objects.filter(username=username).exists():
-#             return JsonResponse(
-#                 {
-#                     "status": False,
-#                     "field": "username",
-#                     "message": "Username already taken."
-#                 },
-#                 status=400,
-#             )
-
-#         # Generate OTP
-#         otp = str(random.randint(100000, 999999))
-
-#         # Store registration data temporarily (5 minutes)
-#         cache.set(
-#             f"register_{email}",
-#             {
-#                 "username": username,
-#                 "email": email,
-#                 "password": password,
-#                 "phone": phone,
-#                 "role": role,
-#                 "otp": otp,
-#             },
-#             timeout=300,  # 5 minutes
-#         )
-
-#         # Send OTP email
-#         send_otp_email(email, otp)
-
-#         return JsonResponse(
-#             {
-#                 "status": True,
-#                 "message": "OTP sent successfully. Please verify your email."
-#             },
-#             status=200,
-#         )
-
-#     except json.JSONDecodeError:
-#         return JsonResponse(
-#             {
-#                 "status": False,
-#                 "message": "Invalid JSON."
-#             },
-#             status=400,
-#         )
-
-#     except Exception as e:
-#         return JsonResponse(
-#             {
-#                 "status": False,
-#                 "message": str(e)
-#             },
-#             status=500,
-#         )
 
 @csrf_exempt
 def register(request):
@@ -339,83 +179,6 @@ def register(request):
             "message": str(e)
         }, status=500)
     
-# @csrf_exempt
-# def login(request):
-#     if request.method != "POST":
-#         return JsonResponse(
-#             {
-#                 "status": False,
-#                 "message": "Only POST request allowed"
-#             },
-#             status=405
-#         )
-
-#     try:
-#         data = json.loads(request.body)
-
-#         email = data.get("email")
-#         password = data.get("password")
-
-#         user = authenticate(
-#             request,
-#             email=email,
-#             password=password
-#         )
-
-#         if user is None:
-#             return JsonResponse(
-#                 {
-#                     "status": False,
-#                      "field": "email",
-#                     "message": "Invalid Email or Password"
-#                 },
-#                 status=401,
-#             )
-
-#         if not user.is_verified:
-#             return JsonResponse(
-#                 {
-#                     "status": False,
-#                     "field": "email",
-#                     "message": "Please verify your email first."
-#                 },
-#                 status=403,
-#             )
-
-#         tokens = get_tokens_for_user(user)
-
-#         return JsonResponse(
-#             {
-#                 "status": True,
-#                 "message": "Login Successful",
-#                 "access": tokens["access"],
-#                 "refresh": tokens["refresh"],
-#                 "user": {
-#                     "id": user.id,
-#                     "username": user.username,
-#                     "email": user.email,
-#                     "role": user.role,
-#                 }
-#             }
-#         )
-
-#     except json.JSONDecodeError:
-#         return JsonResponse(
-#             {
-#                 "status": False,
-#                 "message": "Invalid JSON data."
-#             },
-#             status=400,
-#         )
-
-#     except Exception as e:
-#         return JsonResponse(
-#             {
-#                 "status": False,
-#                 "message": str(e)
-#             },
-#             status=500,
-#         )
 
 @csrf_exempt
 def login(request):
@@ -523,103 +286,6 @@ def login(request):
             status=500,
         )
 
-# @csrf_exempt
-# def verify_otp(request):
-#     if request.method != "POST":
-#         return JsonResponse(
-#             {
-#                 "status": False,
-#                 "message": "Only POST request allowed"
-#             },
-#             status=405,
-#         )
-
-#     try:
-#         data = json.loads(request.body)
-
-#         # FIRST assign the variables
-#         email = data.get("email")
-#         otp = data.get("otp")
-
-#         # if not email or not otp:
-#         #     return JsonResponse(
-#         #         {
-#         #             "status": False,
-#         #             "message": "Email and OTP are required."
-#         #         },
-#         #         status=400,
-#         #     )
-#         if not email:
-#             return JsonResponse({
-#                 "status": False,
-#                 "field": "email",
-#                 "message": "Email is required."
-#             }, status=400)
-
-#         if not otp:
-#             return JsonResponse({
-#                 "status": False,
-#                 "field": "otp",
-#                 "message": "OTP is required."
-#             }, status=400)
-
-#         print("EMAIL:", email)
-#         print("OTP:", otp)
-
-#         # NOW use email
-#         registration_data = cache.get(f"register_{email}")
-
-#         print("CACHE:", registration_data)
-
-#         if not registration_data:
-#             return JsonResponse(
-#                 {
-#                     "status": False,
-#                       "field": "otp",
-#                     "message": "OTP expired or registration session not found."
-#                 },
-#                 status=400,
-#             )
-
-#         if registration_data["otp"] != otp:
-#             return JsonResponse(
-#                 {
-#                     "status": False,
-#                      "field": "otp",
-#                     "message": "Invalid OTP."
-#                 },
-#                 status=400,
-#             )
-
-#         User.objects.create_user(
-#             username=registration_data["username"],
-#             email=registration_data["email"],
-#             password=registration_data["password"],
-#             phone=registration_data["phone"],
-#             role=registration_data["role"],
-#             is_verified=True,
-#         )
-
-#         cache.delete(f"register_{email}")
-
-#         return JsonResponse(
-#             {
-#                 "status": True,
-#                 "message": "Registration completed successfully."
-#             }
-#         )
-
-#     except Exception as e:
-#         import traceback
-#         traceback.print_exc()
-
-#         return JsonResponse(
-#             {
-#                 "status": False,
-#                 "message": str(e)
-#             },
-#             status=500,
-#         )
 
 @csrf_exempt
 def verify_otp(request):
@@ -743,41 +409,6 @@ def verify_otp(request):
         )
 
     
-# @csrf_exempt
-# def logout(request):
-
-#     if request.method != "POST":
-#         return JsonResponse(
-#             {
-#                 "status": False,
-#                 "message": "Only POST allowed",
-#             },
-#             status=405,
-#         )
-
-#     try:
-#         data = json.loads(request.body)
-
-#         refresh_token = data.get("refresh")
-
-#         token = RefreshToken(refresh_token)
-#         token.blacklist()
-
-#         return JsonResponse(
-#             {
-#                 "status": True,
-#                 "message": "Logout Successful",
-#             }
-#         )
-
-#     except Exception:
-#         return JsonResponse(
-#             {
-#                 "status": False,
-#                 "message": "Invalid token",
-#             },
-#             status=400,
-#         )
 
 @csrf_exempt
 def logout(request):
@@ -836,72 +467,6 @@ def logout(request):
             status=400,
         )
 
-# @csrf_exempt
-# def forgot_password(request):
-
-#     if request.method != "POST":
-#         return JsonResponse(
-#             {
-#                 "status": False,
-#                 "message": "Only POST request allowed"
-#             },
-#             status=405,
-#         )
-
-#     try:
-
-#         data = json.loads(request.body)
-
-#         email = data.get("email")
-
-#         if not email:
-#             return JsonResponse(
-#                 {
-#                     "status": False,
-#                      "field": "email",
-#                     "message": "Email is required"
-#                 },
-#                 status=400,
-#             )
-
-#         try:
-#             user = User.objects.get(email=email)
-
-#         except User.DoesNotExist:
-
-#             return JsonResponse(
-#                 {
-#                     "status": False,
-#                         "field": "email",
-#                     "message": "No account found with this email."
-#                 },
-#                 status=404,
-#             )
-
-#         otp = str(random.randint(100000, 999999))
-
-#         user.otp = otp
-#         user.otp_created_at = timezone.now()
-#         user.save()
-
-#         send_otp_email(user.email, otp)
-
-#         return JsonResponse(
-#             {
-#                 "status": True,
-#                 "message": "OTP sent successfully."
-#             }
-#         )
-
-#     except Exception as e:
-
-#         return JsonResponse(
-#             {
-#                 "status": False,
-#                 "message": str(e)
-#             },
-#             status=500,
-#         )
 
 @csrf_exempt
 def forgot_password(request):
@@ -995,98 +560,6 @@ def forgot_password(request):
             status=500,
         )
 
-# @csrf_exempt
-# def verify_reset_otp(request):
-
-#     if request.method != "POST":
-#         return JsonResponse(
-#             {
-#                 "status": False,
-#                 "message": "Only POST request allowed"
-#             },
-#             status=405,
-#         )
-
-#     try:
-
-#         data = json.loads(request.body)
-
-#         email = data.get("email")
-#         otp = data.get("otp")
-
-#         user = User.objects.filter(email=email).first()
-
-#         if not user:
-#             return JsonResponse(
-#                 {
-#                     "status": False,
-#                      "field": "email",
-#                     "message": "User not found."
-#                 },
-#                 status=404,
-#             )
-
-#         if user.otp != otp:
-#             return JsonResponse(
-#                 {
-#                     "status": False,
-#                      "field": "otp",
-#                     "message": "Invalid OTP."
-#                 },
-#                 status=400,
-#             )
-
-#         if timezone.now() > user.otp_created_at + timedelta(minutes=5):
-#             return JsonResponse(
-#                 {
-#                     "status": False,
-#                     "field": "otp",
-#                     "message": "OTP expired."
-#                 },
-#                 status=400,
-#             )
-
-
-#         # ADD THIS LINE
-#         cache.set(
-#             f"reset_verified_{email}",
-#             True,
-#             timeout=300
-#         )
-
-
-#         return JsonResponse(
-#             {
-#                 "status": True,
-#                 "message": "OTP Verified Successfully."
-#             }
-#         )
-
-#         # if timezone.now() > user.otp_created_at + timedelta(minutes=5):
-#         #     return JsonResponse(
-#         #         {
-#         #             "status": False,
-#         #             "message": "OTP expired."
-#         #         },
-#         #         status=400,
-#         #     )
-
-#         # return JsonResponse(
-#         #     {
-#         #         "status": True,
-#         #         "message": "OTP Verified Successfully."
-#         #     }
-#         # )
-
-#     except Exception as e:
-
-#         return JsonResponse(
-#             {
-#                 "status": False,
-#                 "message": str(e)
-#             },
-#             status=500,
-#         )
 
 @csrf_exempt
 def verify_reset_otp(request):
@@ -1221,124 +694,6 @@ def verify_reset_otp(request):
             status=500,
         )
     
-# @csrf_exempt
-# def reset_password(request):
-
-#     if request.method != "POST":
-#         return JsonResponse(
-#             {
-#                 "status": False,
-#                 "message": "Only POST request allowed"
-#             },
-#             status=405
-#         )
-
-#     try:
-
-#         data = json.loads(request.body)
-
-#         email = data.get("email")
-#         password = data.get("password")
-
-
-#         # if not email or not password:
-#         #     return JsonResponse(
-#         #         {
-#         #             "status": False,
-#         #             "message": "Email and password are required"
-#         #         },
-#         #         status=400
-#         #     )
-#         if not email:
-#             return JsonResponse({
-#                 "status": False,
-#                 "field": "email",
-#                 "message": "Email is required."
-#             }, status=400)
-
-#         if not password:
-#             return JsonResponse({
-#                 "status": False,
-#                 "field": "password",
-#                 "message": "Password is required."
-#             }, status=400)
-
-#         if len(password) < 8:
-#             return JsonResponse({
-#                 "status": False,
-#                 "field": "password",
-#                 "message": "Password must be at least 8 characters."
-#             }, status=400)
-
-#         user = User.objects.filter(email=email).first()
-#         verified = cache.get(
-#         f"reset_verified_{email}"
-#         )
-
-#         if not verified:
-#             return JsonResponse(
-#                 {
-#                     "status": False,
-#                      "field": "otp",
-#                     "message": "Please verify OTP first."
-#                 },
-#                 status=403
-#             )
-
-
-#         if not user:
-#             return JsonResponse(
-#                 {
-#                     "status": False,
-#                      "field": "email",
-#                     "message": "User not found"
-#                 },
-#                 status=404
-#             )
-
-
-#         # Change password
-#         user.set_password(password)
-
-#         # Clear OTP
-#         user.otp = None
-#         user.otp_created_at = None
-
-#         user.save()
-
-
-#         return JsonResponse(
-#             {
-#                 "status": True,
-#                 "message": "Password changed successfully"
-#             },
-#             status=200
-#         )
-
-
-#     except json.JSONDecodeError:
-
-#         return JsonResponse(
-#             {
-#                 "status":False,
-#                 "field": "json",
-#                 "message":"Invalid JSON"
-#             },
-#             status=400
-#         )
-
-
-#     except Exception as e:
-
-#         print("RESET PASSWORD ERROR:", e)
-
-#         return JsonResponse(
-#             {
-#                 "status":False,
-#                 "message":str(e)
-#             },
-#             status=500
-#         )
     
 @csrf_exempt
 def reset_password(request):
@@ -1467,7 +822,13 @@ def reset_password(request):
         )
 
 
-
+@api_view(["GET"])
+def smtp_test(request):
+    try:
+        socket.create_connection(("smtp.gmail.com", 587), timeout=10)
+        return Response({"status": "SMTP connection successful"})
+    except Exception as e:
+        return Response({"error": str(e)})
 
 
 

@@ -162,7 +162,8 @@ def register(request):
         )
 
         # Send OTP
-        send_otp_email(email, otp)
+        email_status = send_otp_email(email, otp)
+        print("OTP EMAIL STATUS:", email_status)
 
         return JsonResponse({
             "status": True,

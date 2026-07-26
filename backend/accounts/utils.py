@@ -13,6 +13,7 @@
 
 from django.core.mail import send_mail
 from django.conf import settings
+import traceback
 
 
 def send_otp_email(email, otp):
@@ -25,9 +26,10 @@ def send_otp_email(email, otp):
             fail_silently=False,
         )
 
-        print("EMAIL SENT RESULT:", result)
+        print("EMAIL SENT:", result)
         return True
 
     except Exception as e:
-        print("EMAIL ERROR:", repr(e))
+        print("EMAIL FAILED:", str(e))
+        traceback.print_exc()
         return False

@@ -206,3 +206,16 @@ EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
+
+
+
+
+
+
+print("===== EMAIL DEBUG =====")
+print("HOST:", EMAIL_HOST)
+print("PORT:", EMAIL_PORT)
+print("TLS:", EMAIL_USE_TLS)
+print("USER:", EMAIL_HOST_USER)
+print("PASSWORD EXISTS:", bool(EMAIL_HOST_PASSWORD))
+print("======================")

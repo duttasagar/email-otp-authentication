@@ -828,22 +828,10 @@ def reset_password(request):
 @api_view(["GET"])
 def smtp_test(request):
     try:
-        ip = socket.gethostbyname("smtp-relay.brevo.com")
-        conn = socket.create_connection(("smtp-relay.brevo.com", 587), timeout=10)
-        conn.close()
-
-        return Response({
-            "host": "smtp-relay.brevo.com",
-            "ip": ip,
-            "status": "Connection successful"
-        })
-
+        socket.create_connection(("smtp.gmail.com", 587), timeout=10)
+        return Response({"status": "Gmail SMTP connection successful"})
     except Exception as e:
-        return Response({
-            "error": str(e),
-            "host": "smtp-relay.brevo.com"
-        }, status=500)
-
+        return Response({"error": str(e)})
 
 
 

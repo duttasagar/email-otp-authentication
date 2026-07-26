@@ -22,11 +22,6 @@ class User(AbstractUser):
         null=True
     )
 
-    profile_image = models.ImageField(
-        upload_to="profile/",
-        blank=True,
-        null=True
-    )
 
     is_verified = models.BooleanField(default=False)
 
